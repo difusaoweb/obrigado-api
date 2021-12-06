@@ -8,7 +8,14 @@ export default class UsersController {
     return all
   }
 
-  public async create({ request }: HttpContextContract) {
+  public async show({ request }: HttpContextContract) {
+    const { id } = request.only(id)
+    const all = await User.findBy('id')
+
+    return all
+  }
+
+  public async store({ request }: HttpContextContract) {
     const { user_login, user_pass, user_email, display_name } = request.only([
       'user_login',
       'user_pass',
@@ -24,5 +31,13 @@ export default class UsersController {
     })
 
     return user
+  }
+
+  public async update() {
+    return 'Update user'
+  }
+
+  public async destroy() {
+    return 'Remove user'
   }
 }
