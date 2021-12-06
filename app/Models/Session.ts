@@ -22,7 +22,7 @@ export default class Session extends BaseModel {
   public updatedAt: DateTime
 
   @beforeSave()
-  public static async hashPassword (session: Session) {
+  public static async hashPassword(session: Session) {
     if (session.$dirty.password) {
       session.password = await Hash.make(session.password)
     }
