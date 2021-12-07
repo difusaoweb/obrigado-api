@@ -9,14 +9,14 @@ export default class UsersController {
   }
 
   public async show({ request }: HttpContextContract) {
-    const { id } = request.only(id)
-    const all = await User.findBy('id')
+    const id: number = request.param('id')
+    const user = await User.find(id)
 
-    return all
+    return user
   }
 
   public async store({ request }: HttpContextContract) {
-    const { user_login, user_pass, user_email, display_name } = request.only([
+    const { userLogin, userPass, userEmail, displayName } = request.only([
       'user_login',
       'user_pass',
       'user_email',
@@ -24,20 +24,47 @@ export default class UsersController {
     ])
 
     const user = await User.create({
-      user_login,
-      user_pass,
-      user_email,
-      display_name,
+      user_login: userLogin,
+      user_pass: userPass,
+      user_email: userEmail,
+      display_name: displayName,
     })
 
     return user
   }
 
-  public async update() {
-    return 'Update user'
+  public async update({ request }: HttpContextContract) {
+    const id: number = request.param('id')
+    const theUser = await User.find(id)
+    if (!theUser) {
+      return 'Usuario não econtrado'
+    }
+
+    const { userLogin, userPass, userEmail, displayName } = request.only([
+      'user_login',
+      'user_pass',
+      'user_email',
+      'display_name',
+    ])
+
+    const user = await User.updateOrCreate(
+      { id: id },
+      {
+        user_login: userLogin,
+        user_pass: userPass,
+        user_email: userEmail,
+        display_name: displayName,
+      }
+    )
+
+    return user
   }
 
-  public async destroy() {
-    return 'Remove user'
+  public async destroy({ request }: HttpContextContract) {
+    const id: number = request.param('id')
+    const user = await User.find(id)
+    if (user) {
+      await user.delete()
+    }
   }
 }
