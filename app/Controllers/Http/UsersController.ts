@@ -24,10 +24,10 @@ export default class UsersController {
     ])
 
     const user = await User.create({
-      user_login: userLogin,
-      user_pass: userPass,
-      user_email: userEmail,
-      display_name: displayName,
+      userLogin,
+      userPass,
+      userEmail,
+      displayName,
     })
 
     return user
@@ -50,10 +50,10 @@ export default class UsersController {
     const user = await User.updateOrCreate(
       { id: id },
       {
-        user_login: userLogin,
-        user_pass: userPass,
-        user_email: userEmail,
-        display_name: displayName,
+        userLogin,
+        userPass,
+        userEmail,
+        displayName,
       }
     )
 

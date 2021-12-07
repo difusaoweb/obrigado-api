@@ -1,5 +1,6 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Notification from 'App/Models/Notification'
+import User from 'App/Models/User'
 
 export default class NotificationsController {
   public async index() {
@@ -15,10 +16,14 @@ export default class NotificationsController {
     return notification
   }
 
-  public async store({ request }: HttpContextContract) {
+  public async store({ auth, request }: HttpContextContract) {
     const { title, link } = request.only(['title', 'link'])
 
+    await auth.use('api').authenticate()
+    const userId = auth.use('api').user.id
+
     const notification = await Notification.create({
+      userId,
       title,
       link,
     })

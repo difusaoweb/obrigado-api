@@ -11,20 +11,20 @@ export default class SessionsController {
     const user = await User.query().where('user_email', email).firstOrFail()
 
     // Verify password
-    if (!(await Hash.verify(user.user_pass, password))) {
+    if (!(await Hash.verify(user.userPass, password))) {
       return response.badRequest('Invalid password')
     }
 
     // Generate token
     const token = await auth.use('api').generate(user, {
-      name: user?.serialize().display_name,
+      name: user?.serialize().displayName,
       expiresIn: '7days',
     })
 
     return token
   }
 
-  public async logout({ auth, response }: HttpContextContract) {
+  public async logout({ auth }: HttpContextContract) {
     await auth.use('api').revoke()
     return {
       revoked: true,
