@@ -37,25 +37,47 @@ export default class UsersController {
     const id: number = request.param('id')
     const theUser = await User.find(id)
     if (!theUser) {
-      return 'Usuario não econtrado'
+      return 'Usuário não econtrado.'
     }
 
-    const { userLogin, userPass, userEmail, displayName } = request.only([
-      'user_login',
-      'user_pass',
-      'user_email',
-      'display_name',
-    ])
+    const parms = request.only(['user_login', 'user_pass', 'user_email', 'display_name'])
+    let userObj = {}
 
-    const user = await User.updateOrCreate(
-      { id: id },
-      {
-        userLogin,
-        userPass,
-        userEmail,
-        displayName,
+    //userLogin
+    if (parms.user_login) {
+      if (parms.user_login != theUser.userLogin) {
+        const searchUserLogin = await User.findBy('user_login', parms.user_login)
+        if (searchUserLogin) {
+          return 'userLogin já está em uso.'
+        }
+
+        userObj.userLogin = parms.user_login
       }
-    )
+    }
+    //userLogin
+
+    //userEmail
+    if (parms.user_email) {
+      if (parms.user_email != theUser.userEmail) {
+        const searchUserEmail = await User.findBy('user_email', parms.user_email)
+        if (searchUserEmail) {
+          return 'userEmail já está em uso.'
+        }
+
+        userObj.userEmail = parms.user_email
+      }
+    }
+    //userEmail
+
+    if (parms.display_name) {
+      userObj.displayName = parms.display_name
+    }
+
+    if (parms.user_pass) {
+      userObj.userPass = parms.user_pass
+    }
+
+    const user = await User.updateOrCreate({ id: id }, userObj)
 
     return user
   }
