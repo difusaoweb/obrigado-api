@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import Hash from '@ioc:Adonis/Core/Hash'
 import { BaseModel, column, beforeSave, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm'
-import Notification from 'App/Models/Notification'
+import Obrigado from 'App/Models/Obrigado'
 
 export default class User extends BaseModel {
   @column({ isPrimary: true })
@@ -19,6 +19,9 @@ export default class User extends BaseModel {
   @column()
   public displayName: string
 
+  @column()
+  public amount: number
+
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
 
@@ -32,6 +35,6 @@ export default class User extends BaseModel {
     }
   }
 
-  @hasMany(() => Notification)
-  public notification: HasMany<typeof Notification>
+  @hasMany(() => Obrigado)
+  public obrigados: HasMany<typeof Obrigado>
 }

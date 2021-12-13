@@ -1,5 +1,9 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import { schema } from '@ioc:Adonis/Core/Validator'
+import Env from '@ioc:Adonis/Core/Env'
+
 import User from 'App/Models/User'
+import Obrigado from 'App/Models/Obrigado'
 
 export default class UsersController {
   public async index() {
@@ -9,25 +13,48 @@ export default class UsersController {
   }
 
   public async show({ request }: HttpContextContract) {
-    const id: number = request.param('id')
-    const user = await User.find(id)
+    const newSchema = schema.create({
+      id: schema.number(),
+    })
+    const requestBody = await request.validate({ schema: newSchema })
+
+    const user = await User.findOrFail(requestBody.id)
 
     return user
   }
 
-  public async store({ request }: HttpContextContract) {
-    const { userLogin, userPass, userEmail, displayName } = request.only([
-      'user_login',
-      'user_pass',
-      'user_email',
-      'display_name',
-    ])
+  public async store({ auth, request, response }: HttpContextContract) {
+    const newSchema = schema.create({
+      user_login: schema.string(),
+      user_pass: schema.string(),
+      user_email: schema.string(),
+      display_name: schema.string(),
+    })
+    const requestBody = await request.validate({ schema: newSchema })
 
     const user = await User.create({
-      userLogin,
-      userPass,
-      userEmail,
-      displayName,
+      userLogin: requestBody.user_login,
+      userPass: requestBody.user_pass,
+      userEmail: requestBody.user_email,
+      displayName: requestBody.display_name,
+    })
+
+    const obrigadoUser = await User.findByOrFail(
+      'user_login',
+      Env.get('BUSINESS_ACCOUNT_USER_NAME')
+    )
+
+    obrigadoUser.obrigados -= 3
+    user.obrigados += 3
+
+    obrigadoUser.save()
+    user.save()
+
+    const obrigado = await Obrigado.create({
+      senderId: obrigadoUser.id,
+      receiverId: user.id,
+      value: 3,
+      message: 'Muito obrigado por vir para nossa plataforma!',
     })
 
     return user

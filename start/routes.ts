@@ -1,7 +1,7 @@
 import Route from '@ioc:Adonis/Core/Route'
 
 import 'App/Modules/User/routes'
-import 'App/Modules/Notification/routes'
+import 'App/Modules/Obrigado/routes'
 
 Route.group(() => {
   // Login
