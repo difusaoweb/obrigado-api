@@ -324,7 +324,7 @@ export default class ObrigadosController {
       switch (err?.message) {
         case 'USER_IS_NOT_THE_SENDER_OR_NOT_FOUND':
           response.send({ failure: { message: 'User is not the sender or not found.' } })
-          response.status(403)
+          response.status(404)
           break
       }
       return response
