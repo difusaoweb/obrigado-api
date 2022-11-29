@@ -1,6 +1,14 @@
 import { DateTime } from 'luxon'
 import Hash from '@ioc:Adonis/Core/Hash'
-import { BaseModel, column, beforeSave, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm'
+import {
+  BaseModel,
+  column,
+  beforeSave,
+  hasMany,
+  HasMany,
+  manyToMany,
+  ManyToMany,
+} from '@ioc:Adonis/Lucid/Orm'
 import Obrigado from 'App/Models/Obrigado'
 
 export default class User extends BaseModel {
@@ -8,19 +16,25 @@ export default class User extends BaseModel {
   public id: number
 
   @column()
-  public userLogin: string
+  public email: string
 
   @column({ serializeAs: null })
-  public userPass: string
+  public password: string
 
   @column()
-  public userEmail: string
+  public username: string
 
   @column()
-  public displayName: string
+  public name: string
 
   @column()
-  public amount: number
+  public avatar: string | null
+
+  @column()
+  public description: string | null
+
+  @column()
+  public link: string | null
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
@@ -30,11 +44,26 @@ export default class User extends BaseModel {
 
   @beforeSave()
   public static async hashPassword(user: User) {
-    if (user.$dirty.userPass) {
-      user.userPass = await Hash.make(user.userPass)
+    if (user.$dirty.password) {
+      user.password = await Hash.make(user.password)
     }
   }
 
-  @hasMany(() => Obrigado)
-  public obrigados: HasMany<typeof Obrigado>
+  @manyToMany(() => Obrigado, {
+    pivotTable: 'obrigado_user',
+    localKey: 'id',
+    pivotForeignKey: 'sender_id',
+    relatedKey: 'id',
+    pivotRelatedForeignKey: 'obrigado_id',
+  })
+  public obrigadosSenders: ManyToMany<typeof Obrigado>
+
+  @manyToMany(() => Obrigado, {
+    pivotTable: 'obrigado_user',
+    localKey: 'id',
+    pivotForeignKey: 'receiver_id',
+    relatedKey: 'id',
+    pivotRelatedForeignKey: 'obrigado_id',
+  })
+  public obrigadosReceivers: ManyToMany<typeof Obrigado>
 }
